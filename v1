@@ -1,0 +1,54 @@
+local Finity = loadstring(game:HttpGet("https://pastebin.com/raw/xpT46ucU"))()
+local FinityWindow = Finity.new(true)
+FinityWindow.ChangeToggleKey(Enum.KeyCode.Semicolon)
+local VisualsCategory = FinityWindow:Category("Visuals")
+local TeleportCategory = FinityWindow:Category("Teleport")
+local Computers = TeleportCategory:Sector("Computers")
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CurrentMap = game:GetService("ReplicatedStorage").CurrentMap
+
+local function Map()
+    repeat wait() until CurrentMap.Value ~= nil
+    return CurrentMap.Value
+end
+
+local function findComputers()
+    getgenv().Computers = {}
+    getgenv().ComputerCount = {}
+    local count = 1
+    for i,v in pairs(Map():GetChildren()) do
+        if v.Name == "ComputerTable" then
+            table.insert(ComputerCount, tostring(count))
+            count += 1
+            table.insert(Computers, v)
+        end
+    end
+end
+
+local function IsGameActive()
+    return game:GetService("ReplicatedStorage").IsGameActive.Value
+end
+local function Teleport(pos) -- cframe or vector3
+    LocalPlayer.Character.Head:Destroy()
+    local TpOnSpawn
+    TpOnSpawn = LocalPlayer.CharacterAdded:Connect(function(Char)
+        TpOnSpawn:Disconnect()
+        local HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
+        HumanoidRootPart.Velocity = Vector3.zero
+        if IsGameActive() then
+            HumanoidRootPart:GetPropertyChangedSignal("CFrame"):Wait()
+        end
+        HumanoidRootPart.CFrame = CFrame.new(pos)
+    end)
+end
+
+CurrentMap:GetPropertyChangedSignal("Value"):Connect(findComputers)
+findComputers()
+
+Computers:Cheat("Dropdown", "Computer", function(computer)
+    local Trigger = Computers[tonumber(computer)]["ComputerTrigger3"]
+    Teleport(Trigger.Position)
+end, {
+    options = ComputerCount
+})
