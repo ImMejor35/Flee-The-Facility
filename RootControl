@@ -1,0 +1,42 @@
+-- will later be converted to Desync() and Sync() functions
+local UIS = game:GetService("UserInputService")
+local LocalPlayer = game.Players.LocalPlayer
+local Char = LocalPlayer.Character
+local Synced = true
+local RootOffset = Vector3.new(0,5,0)
+local RootPart, RootClone
+
+UIS.InputBegan:Connect(function(Input)
+    local KeyCode = tostring(Input.KeyCode)
+    local Key = KeyCode:sub(14, #KeyCode)
+    print(Key)
+    if Key == "One" and Synced == true then
+        Synced = false
+        --desync rootpart
+        Char.Parent = game.ReplicatedStorage
+        RootPart = Char.HumanoidRootPart
+        RootPart.CFrame = RootPart.CFrame * CFrame.new(RootOffset)
+        RootPart.Transparency = 0
+        RootPart.RootJoint.Enabled = false
+        RootPart.Anchored = true
+        RootClone = RootPart:Clone()
+        RootClone.CFrame = RootClone.CFrame * CFrame.new(RootOffset * Vector3.new(-1,-1,-1))
+        RootClone.Transparency = 1
+        RootClone.Parent = Char
+        RootClone.Anchored = false
+        Char.PrimaryPart = RootClone
+        RootClone.RootJoint.Enabled = true
+        Char.Parent = Workspace
+    elseif Key == "Two" and Synced == false then
+        Synced = true
+        -- resync rootpart
+        Char.Parent = game.ReplicatedStorage
+        RootClone.CFrame = RootPart.CFrame
+        RootClone.Parent = nil
+        RootPart.Parent = Char
+        RootPart.Anchored = false
+        Char.PrimaryPart = RootPart
+        RootPart.RootJoint.Enabled = true
+        Char.Parent = Workspace
+    end
+end)
